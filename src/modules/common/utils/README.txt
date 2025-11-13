@@ -1,0 +1,1 @@
+Esse diretório é destinado a classes utilitárias que podem ser injetadas pelo Nest.
