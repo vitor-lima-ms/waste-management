@@ -25,7 +25,10 @@ export abstract class AbstractEntity {
     name: AbstractEntityPropertiesDbNamesEnum.CREATED_BY_ID,
     foreignKeyConstraintName: MessagesUtilsClass.generateDbConstraintsNames(
       DbConstraintsEnum.FK,
-      [UserEntityPropertiesDbNamesEnum.ID, `${Math.random() * 100 + 1}`],
+      [
+        UserEntityPropertiesDbNamesEnum.ID,
+        AbstractEntityPropertiesDbNamesEnum.CREATED_BY_ID,
+      ],
     ),
     referencedColumnName: UserEntityPropertiesNamesEnum.ID,
   })
@@ -40,7 +43,10 @@ export abstract class AbstractEntity {
     name: AbstractEntityPropertiesDbNamesEnum.UPDATED_BY_ID,
     foreignKeyConstraintName: MessagesUtilsClass.generateDbConstraintsNames(
       DbConstraintsEnum.FK,
-      [UserEntityPropertiesDbNamesEnum.ID, `${Math.random() * -100 - 1}`],
+      [
+        UserEntityPropertiesDbNamesEnum.ID,
+        AbstractEntityPropertiesDbNamesEnum.UPDATED_BY_ID,
+      ],
     ),
     referencedColumnName: UserEntityPropertiesNamesEnum.ID,
   })

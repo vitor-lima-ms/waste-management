@@ -13,8 +13,17 @@ export class DbUtilsService {
   generateColumnAliasForSelectQuery(columnAlias: string): string {
     return `"${columnAlias}"`;
   }
-  generatePostgreSqlDoubleColonOperator(sqlDataType: SqlDataTypesEnum): string {
-    return `::${sqlDataType}`;
+  /**
+   * @param sqlDataType Tipo de dado de destino da conversão
+   * @returns String de conversão
+   */
+  generatePostgreSqlDoubleColonOperator(
+    sqlDataType: SqlDataTypesEnum | undefined,
+  ): string {
+    if (sqlDataType) {
+      return `::${sqlDataType}`;
+    }
+    return "";
   }
   /**
    *

@@ -31,7 +31,7 @@ import { TypeOrmModule } from "@nestjs/typeorm";
     TypeOrmModule.forRoot({
       autoLoadEntities: true,
       logging: true,
-      synchronize: process.env.NODE_ENV === "development" ? true : false,
+      synchronize: process.env.NODE_ENV === "development" ? false : false,
       type: "postgres",
       url:
         process.env.NODE_ENV === "development" ? process.env.POSTGRES_URL : "",

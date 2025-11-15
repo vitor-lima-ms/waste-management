@@ -31,7 +31,7 @@ export class DisposalPointsHelper {
   generateFindAllOrOneSelectColumns(): string {
     return `${DisposalPointEntityPropertiesDbNamesEnum.ACCEPTED_WASTE_CATEGORY} as ${this.dbUtils.generateColumnAliasForSelectQuery(DisposalPointEntityPropertiesNamesEnum.ACCEPTED_WASTE_CATEGORY)},
 		\t\t${DisposalPointEntityPropertiesDbNamesEnum.ID} as ${this.dbUtils.generateColumnAliasForSelectQuery(DisposalPointEntityPropertiesNamesEnum.ID)},
-		\t\t${DisposalPointEntityPropertiesDbNamesEnum.LATITUDE}${this.dbUtils.generatePostgreSqlDoubleColonOperator(SqlDataTypesEnum.FLOAT)} ${this.dbUtils.generateColumnAliasForSelectQuery(DisposalPointEntityPropertiesNamesEnum.LATITUDE)},
+		\t\t${DisposalPointEntityPropertiesDbNamesEnum.LATITUDE}${this.dbUtils.generatePostgreSqlDoubleColonOperator(SqlDataTypesEnum.FLOAT)} as ${this.dbUtils.generateColumnAliasForSelectQuery(DisposalPointEntityPropertiesNamesEnum.LATITUDE)},
 		\t\t${DisposalPointEntityPropertiesDbNamesEnum.LOCALITY_NAME} as ${this.dbUtils.generateColumnAliasForSelectQuery(DisposalPointEntityPropertiesNamesEnum.LOCALITY_NAME)},
 		\t\t${DisposalPointEntityPropertiesDbNamesEnum.LOCALITY_TYPE} as ${this.dbUtils.generateColumnAliasForSelectQuery(DisposalPointEntityPropertiesNamesEnum.LOCALITY_TYPE)},
 		\t\t${DisposalPointEntityPropertiesDbNamesEnum.LONGITUDE}${this.dbUtils.generatePostgreSqlDoubleColonOperator(SqlDataTypesEnum.FLOAT)} as ${this.dbUtils.generateColumnAliasForSelectQuery(DisposalPointEntityPropertiesNamesEnum.LONGITUDE)},

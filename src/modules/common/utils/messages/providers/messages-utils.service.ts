@@ -44,13 +44,13 @@ export class MessagesUtilsService {
   ): string {
     const lowercasedEntityIdentifier = entityIdentifier.toLowerCase();
     let notUndefinedFlag = false;
-    let propertyNameLength = 0;
+    let propertiesNamesLength = 0;
     let lowercasedPropertyName = "";
     let lowercasedPropertiesNames = "";
     if (propertiesNames) {
       notUndefinedFlag = true;
-      propertyNameLength = propertiesNames.length;
-      if (propertyNameLength > 1) {
+      propertiesNamesLength = propertiesNames.length;
+      if (propertiesNamesLength > 1) {
         const lastPropertyName = propertiesNames.pop();
         const arrayWithoutLastPropertyName = propertiesNames?.filter(
           (value) => value !== lastPropertyName,
@@ -67,8 +67,10 @@ export class MessagesUtilsService {
         return `Impossível realizar ação! Dados faltantes: ${lowercasedPropertiesNames}`;
       case HttpExceptionMessageContextsEnum.NOT_FOUND:
         return `Instância de ${lowercasedEntityIdentifier} não encontrada`;
+      case HttpExceptionMessageContextsEnum.TOO_MUCH_QUERY_PARAMS:
+        return `A filtragem de instâncias de ${lowercasedEntityIdentifier} só é possível a partir de um único parâmetro`;
       case HttpExceptionMessageContextsEnum.UNIQUE_ERROR:
-        return `Já existe ${lowercasedEntityIdentifier} com o mesmo valor de: ${notUndefinedFlag ? (propertyNameLength > 1 ? lowercasedPropertiesNames.toLowerCase() : lowercasedPropertyName.toLowerCase()) : undefined}`;
+        return `Já existe ${lowercasedEntityIdentifier} com o mesmo valor de: ${notUndefinedFlag ? (propertiesNamesLength > 1 ? lowercasedPropertiesNames.toLowerCase() : lowercasedPropertyName.toLowerCase()) : undefined}`;
       case HttpExceptionMessageContextsEnum.UUID_ERROR:
         return "O valor enviado como parâmetro é um uuid inválido";
     }
