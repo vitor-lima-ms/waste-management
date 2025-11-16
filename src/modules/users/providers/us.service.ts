@@ -8,6 +8,8 @@ import { CreateUpdateAndDeleteEnum } from "src/modules/common/utils/messages/enu
 import { EntitiesAliasesEnum } from "src/common/enums/entities-aliases.enum";
 import { EntitiesPtBrNamesEnum } from "src/common/enums/entities-ptbr-names.enum";
 import { HttpExceptionMessageContextsEnum } from "src/modules/common/utils/messages/enums/http-exception-message-contexts.enum";
+import { SqlAggregateFunctionsEnum } from "src/modules/common/utils/db/enums/sql-aggregate-functions.enum";
+import { SqlDataTypesEnum } from "src/modules/common/utils/db/enums/sql-data-types.enum";
 import { UserEntityPropertiesDbNamesEnum } from "../enums/us-entity-properties-db-names.enum";
 import { UserEntityPropertiesPtBrNamesEnum } from "../enums/us-entity-properties-ptbr-names.enum";
 /* Helper imports */
@@ -21,6 +23,7 @@ import { Repository } from "typeorm";
 import { FindAllUsersResponse } from "../responses/find-all-us.response";
 import { FindOneUserResponse } from "../responses/find-one-us.response";
 /* Service imports */
+import { DbUtilsService } from "src/modules/common/utils/db/providers/db-utils.service";
 import { MessagesUtilsService } from "src/modules/common/utils/messages/providers/messages-utils.service";
 import { StringUtilsService } from "src/modules/common/utils/string/providers/string-utils.service";
 /* UsersService */

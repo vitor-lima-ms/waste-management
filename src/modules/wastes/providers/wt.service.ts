@@ -10,6 +10,9 @@ import { EntitiesPtBrNamesEnum } from "src/common/enums/entities-ptbr-names.enum
 import { HttpExceptionMessageContextsEnum } from "src/modules/common/utils/messages/enums/http-exception-message-contexts.enum";
 import { SqlAggregateFunctionsEnum } from "src/modules/common/utils/db/enums/sql-aggregate-functions.enum";
 import { SqlDataTypesEnum } from "src/modules/common/utils/db/enums/sql-data-types.enum";
+import { WasteEntityPropertiesDbNamesEnum } from "../enums/wt-entity-properties-db-names.enum";
+import { WasteEntityPropertiesNamesEnum } from "../enums/wt-entity-properties-names.enum";
+import { WastesTypesEnum } from "../enums/wastes-types.enum";
 /* Helper imports */
 import { WastesHelper } from "./wt.helper";
 /* Nest.js imports */
@@ -17,16 +20,18 @@ import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 /* Other libraries imports */
 import { Repository } from "typeorm";
+import { subDays } from "date-fns";
 /* Response imports */
+import { DisposalVariationComparedToLastMonthResponse } from "../responses/disposal-variation-compared-to-last-month.response";
 import { DpWithHighestNumberOfRecordsResponse } from "../responses/dp-with-highest-number-of-records.response";
 import { FindAllWastesResponse } from "../responses/find-all-wt.response";
+import { FindAllWastesWithoutInnerJoinWithDpResponse } from "../responses/find-all-wt-without-inner-join-with-dp.response";
 import { FindOneDisposalPointResponse } from "src/modules/disposal-points/responses/find-one-dp.response";
+import { MostDiscardedWtTypeResponse } from "../responses/most-discarded-wt-type.response";
 /* Service imports */
 import { DbUtilsService } from "src/modules/common/utils/db/providers/db-utils.service";
 import { DisposalPointsService } from "src/modules/disposal-points/providers/dp.service";
 import { MessagesUtilsService } from "src/modules/common/utils/messages/providers/messages-utils.service";
-import { WasteEntityPropertiesDbNamesEnum } from "../enums/wt-entity-properties-db-names.enum";
-import { WasteEntityPropertiesNamesEnum } from "../enums/wt-entity-properties-names.enum";
 /* WastesService */
 @Injectable()
 export class WastesService {
@@ -74,7 +79,7 @@ export class WastesService {
       this.wastesHelper.getFilterDtoProps(filterWastesDto);
     const queryBuilder = this.wastesRepository
       .createQueryBuilder(EntitiesAliasesEnum.WASTE)
-      .select(this.wastesHelper.generateFindAllOrOneSelectColumns())
+      .select(this.wastesHelper.generateFindAllOrOneSelectColumns(true))
       .innerJoin(
         this.wastesHelper.generateInnerJoinWithDisposalPointEntity().entity,
         this.wastesHelper.generateInnerJoinWithDisposalPointEntity().alias,
@@ -104,13 +109,43 @@ export class WastesService {
   async findAll(): Promise<FindAllWastesResponse[]> {
     return await this.wastesRepository
       .createQueryBuilder(EntitiesAliasesEnum.WASTE)
-      .select(this.wastesHelper.generateFindAllOrOneSelectColumns())
+      .select(this.wastesHelper.generateFindAllOrOneSelectColumns(true))
       .innerJoin(
         this.wastesHelper.generateInnerJoinWithDisposalPointEntity().entity,
         this.wastesHelper.generateInnerJoinWithDisposalPointEntity().alias,
         this.wastesHelper.generateInnerJoinWithDisposalPointEntity().condition,
       )
       .getRawMany<FindAllWastesResponse>();
+  }
+  async internalDiscardAverageOverPastNDays(N: number): Promise<number> {
+    const actualDateAndHour = new Date();
+    const dateAndHourNDaysAgo = subDays(actualDateAndHour, N);
+    const actualIsoDate = actualDateAndHour.toISOString().split("T")[0];
+    const isoDateNDaysAgo = dateAndHourNDaysAgo.toISOString().split("T")[0];
+    const wtBetweenActualAndPastDate = await this.wastesRepository
+      .createQueryBuilder(EntitiesAliasesEnum.WASTE)
+      .select(this.wastesHelper.generateFindAllOrOneSelectColumns(false))
+      .where(
+        `${WasteEntityPropertiesDbNamesEnum.DATETIME}${this.dbUtils.generatePostgreSqlDoubleColonOperator(SqlDataTypesEnum.DATE)} BETWEEN :isoDateNDaysAgo AND :actualIsoDate`,
+        { isoDateNDaysAgo, actualIsoDate },
+      )
+      .getRawMany<FindAllWastesWithoutInnerJoinWithDpResponse>();
+    const discardAverageOverPastNDays = parseFloat(
+      (wtBetweenActualAndPastDate.length / N).toFixed(2),
+    );
+    return discardAverageOverPastNDays;
+  }
+  async internalDisposalVariationComparedToLastMonth(): Promise<DisposalVariationComparedToLastMonthResponse> {
+    const currentMonth = new Date().getMonth() + 1;
+    const pastMonth = currentMonth - 1;
+    const allWastes = await this.findAll();
+    const disposalVariationComparedToLastMonth =
+      this.wastesHelper.getDisposalVariationComparedToLastMonth(
+        currentMonth,
+        allWastes,
+        pastMonth,
+      );
+    return disposalVariationComparedToLastMonth;
   }
   async internalDpWithHighestNumberOfRecords(): Promise<FindOneDisposalPointResponse> {
     const dpIdOrderedByCount = await this.wastesRepository
@@ -124,9 +159,30 @@ export class WastesService {
       .getRawMany<DpWithHighestNumberOfRecordsResponse>();
     const dpIdWithHighestNumberOfRecords = dpIdOrderedByCount[0].wtDpId;
     const dpWithHighestNumberOfRecords =
-      await this.disposalPointsService.internalFindOneById(
+      (await this.disposalPointsService.internalFindOneById(
         dpIdWithHighestNumberOfRecords,
-      );
-    return dpWithHighestNumberOfRecords!;
+      ))!;
+    return dpWithHighestNumberOfRecords;
+  }
+  async internalMostDiscardedWtType(): Promise<WastesTypesEnum> {
+    const typeOrderedByCount = await this.wastesRepository
+      .createQueryBuilder(EntitiesAliasesEnum.WASTE)
+      .select(
+        `${WasteEntityPropertiesDbNamesEnum.TYPE} as ${this.dbUtils.generateColumnAliasForSelectQuery(WasteEntityPropertiesNamesEnum.TYPE)},
+        ${this.dbUtils.generateAggregateFunction(SqlAggregateFunctionsEnum.COUNT, WasteEntityPropertiesDbNamesEnum.TYPE)}`,
+      )
+      .groupBy(`${WasteEntityPropertiesDbNamesEnum.TYPE}`)
+      .orderBy(SqlAggregateFunctionsEnum.COUNT, "DESC")
+      .getRawMany<MostDiscardedWtTypeResponse>();
+    return typeOrderedByCount[0].wtType;
+  }
+  async internalTotalUs(): Promise<number> {
+    const { count } = (await this.wastesRepository
+      .createQueryBuilder(EntitiesAliasesEnum.WASTE)
+      .select(
+        `${this.dbUtils.generateAggregateFunction(SqlAggregateFunctionsEnum.COUNT, WasteEntityPropertiesDbNamesEnum.USER_NAME, true)}${this.dbUtils.generatePostgreSqlDoubleColonOperator(SqlDataTypesEnum.INT)}`,
+      )
+      .getRawOne<{ count: number }>())!;
+    return count;
   }
 }

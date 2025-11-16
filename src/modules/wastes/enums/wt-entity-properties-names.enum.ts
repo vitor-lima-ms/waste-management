@@ -1,6 +1,6 @@
 /* WasteEntityPropertiesNamesEnum */
 export enum WasteEntityPropertiesNamesEnum {
-  DATE = "wtDatetime",
+  DATETIME = "wtDatetime",
   DISPOSAL_POINT_ID = "wtDpId",
   ID = "wtId",
   TYPE = "wtType",

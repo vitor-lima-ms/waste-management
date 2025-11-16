@@ -15,7 +15,7 @@ export class CreateWasteDto {
     },
     {
       message: MessagesUtilsClass.generateClassValidatorErrorMessage(
-        WasteEntityPropertiesPtBrNamesEnum.DATE,
+        WasteEntityPropertiesPtBrNamesEnum.DATETIME,
         ClassValidatorDecoratorsNamesEnum.IS_DATE_STRING,
       ),
     },

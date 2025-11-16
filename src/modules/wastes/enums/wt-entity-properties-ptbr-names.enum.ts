@@ -1,6 +1,6 @@
 /* WasteEntityPropertiesPtBrNamesEnum */
 export enum WasteEntityPropertiesPtBrNamesEnum {
-  DATE = "Data e hora",
+  DATETIME = "Data e hora",
   DISPOSAL_POINT_ID = "Ponto de descarte (ID)",
   ID = "ID",
   TYPE = "Tipo",

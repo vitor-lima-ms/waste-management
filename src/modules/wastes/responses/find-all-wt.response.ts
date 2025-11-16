@@ -11,7 +11,7 @@ export class FindAllWastesResponse extends PickType(
   IntersectionType(DisposalPointEntity, WasteEntity),
   [
     DisposalPointEntityPropertiesNamesEnum.LOCALITY_NAME,
-    WasteEntityPropertiesNamesEnum.DATE,
+    WasteEntityPropertiesNamesEnum.DATETIME,
     WasteEntityPropertiesNamesEnum.DISPOSAL_POINT_ID,
     WasteEntityPropertiesNamesEnum.ID,
     WasteEntityPropertiesNamesEnum.TYPE,

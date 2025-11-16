@@ -9,17 +9,20 @@ export class DbUtilsService {
   /**
    * @param aggFunc Identificação da função de agregação
    * @param propertyName Propriedade a ser agregada
-   * @returns String que combina aggFunc e propertyName
+   * @param distinct Utilizado caso o COUNT precise contabilizar linhas sem repetição de valores
+   * do atributo
+   * @returns String que combina aggFunc, distinct e propertyName
    */
   generateAggregateFunction(
     aggFunc: SqlAggregateFunctionsEnum,
     propertyName: string,
+    distinct?: boolean,
   ): string {
     switch (aggFunc) {
       case SqlAggregateFunctionsEnum.AVG:
         return `${SqlAggregateFunctionsEnum.AVG}(${propertyName})`;
       case SqlAggregateFunctionsEnum.COUNT:
-        return `${SqlAggregateFunctionsEnum.COUNT}(${propertyName})`;
+        return `${SqlAggregateFunctionsEnum.COUNT}(${distinct ? "DISTINCT " : ""}${propertyName})`;
       case SqlAggregateFunctionsEnum.MAX:
         return `${SqlAggregateFunctionsEnum.MAX}(${propertyName})`;
       case SqlAggregateFunctionsEnum.MIN:

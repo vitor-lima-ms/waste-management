@@ -19,7 +19,7 @@ import {
 @Entity({ name: "Waste" })
 export class WasteEntity extends AbstractEntity {
   @Column({
-    name: WasteEntityPropertiesDbNamesEnum.DATE,
+    name: WasteEntityPropertiesDbNamesEnum.DATETIME,
     type: "timestamp with time zone",
   })
   wtDatetime: string;
